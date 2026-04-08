@@ -1,0 +1,13 @@
+{
+  "name": "sytec_site_redesenhado",
+  "version": "1.0.0",
+  "description": "Site redesenhado",
+  "main": "systec-redesenhado.html",
+  "scripts": {
+    "dev": "live-server --open=systec-redesenhado.html --port=3000",
+    "start": "npm run dev"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

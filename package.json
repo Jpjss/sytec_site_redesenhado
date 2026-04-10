@@ -5,7 +5,8 @@
   "main": "systec-redesenhado.html",
   "scripts": {
     "dev": "live-server --open=systec-redesenhado.html --port=3000",
-    "start": "npm run dev"
+    "start": "npm run dev",
+    "build": "node build.js"
   },
   "devDependencies": {
     "live-server": "^1.2.2"

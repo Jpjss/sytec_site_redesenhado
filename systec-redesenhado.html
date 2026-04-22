@@ -282,7 +282,7 @@
     animation: fadeUp 0.8s 0.6s ease both;
   }
   .stat-num {
-    font-family: var(--font-display); font-size: 1.4rem; font-weight: 800;
+    font-family: var(--font-body); font-size: 1.4rem; font-weight: 800;
     color: var(--c-white); line-height: 1;
   }
   .stat-num span { color: var(--c-accent); }
@@ -524,7 +524,7 @@
   .sol-card:hover::before { transform: scaleX(1); }
   .sol-card:hover { transform: translateY(-6px); border-color: rgba(43,111,179,0.12); }
   .sol-num {
-    font-family: var(--font-display); font-size: 2.4rem; font-weight: 800;
+    font-family: var(--font-body); font-size: 2.4rem; font-weight: 800;
     color: rgba(248,246,241,0.05); line-height: 1; margin-bottom: 1rem;
     position: absolute; top: 1rem; right: 1.5rem;
   }
@@ -767,7 +767,6 @@
     <li><a href="#clientes">Clientes</a></li>
   </ul>
   <div class="nav-actions">
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Ativar tema claro">Tema claro</button>
     <a href="https://api.whatsapp.com/send/?phone=556295063000&text=Olá!+Solicito+contato+comercial,+venho+a+partir+do+site" class="nav-cta" target="_blank">Fale Conosco</a>
   </div>
 </nav>
@@ -1009,7 +1008,7 @@
     <div class="clientes-header reveal">
       <div class="section-label">Clientes</div>
       <h2 class="section-title">Quem confia na <span class="accent">Systec</span></h2>
-      <p style="color:var(--c-muted);margin-top:0.8rem;font-size:1rem;">Empresas que escolheram a Systec para transformar a gestão de suas lojas.</p>
+      <p style="color:var(--c-muted);margin-top:0.8rem;font-size:1rem;">De pequenos negócios a grandes operações — veja alguns dos nossos clientes.</p>
     </div>
 
     <div class="clientes-logos">
@@ -1088,7 +1087,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2025 Systec Sistemas. Todos os direitos reservados.</span>
+    <span>© <span id="copyrightYear"></span> Systec Sistemas. Todos os direitos reservados.</span>
     <span>Matriz: Goiânia – GO</span>
   </div>
 </footer>
@@ -1101,43 +1100,8 @@
 </a>
 
 <script>
-const THEME_STORAGE_KEY = 'systec-theme';
-const themeToggle = document.getElementById('themeToggle');
-
-function applyTheme(themeName) {
-  document.body.setAttribute('data-theme', themeName);
-  const isLight = themeName === 'light';
-  themeToggle.textContent = isLight ? 'Tema escuro' : 'Tema claro';
-  themeToggle.setAttribute('aria-label', isLight ? 'Ativar tema escuro' : 'Ativar tema claro');
-}
-
-let initialTheme = 'dark';
-try {
-  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  if (savedTheme === 'light' || savedTheme === 'dark') {
-    initialTheme = savedTheme;
-  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    // Prioriza tema escuro quando o sistema do usuário prefere dark
-    initialTheme = 'dark';
-  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-    // Caso o sistema prefira claro, usa claro
-    initialTheme = 'light';
-  }
-} catch (error) {
-  initialTheme = 'dark';
-}
-applyTheme(initialTheme);
-
-themeToggle.addEventListener('click', () => {
-  const currentTheme = document.body.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-  const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
-  applyTheme(nextTheme);
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-  } catch (error) {
-    // Ignora falhas de armazenamento para manter a troca funcional.
-  }
-});
+// Tema escuro permanente
+document.body.setAttribute('data-theme', 'dark');
 
 // Custom cursor
 const cursor = document.getElementById('cursor');
@@ -1207,6 +1171,13 @@ const counterObserver = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.5 });
 counterObserver.observe(document.getElementById('statClientes'));
+// Atualiza ano do rodapé dinamicamente
+(function(){
+  try {
+    const y = document.getElementById('copyrightYear');
+    if (y) y.textContent = new Date().getFullYear();
+  } catch (e) { /* silent */ }
+})();
 </script>
 </body>
 </html>

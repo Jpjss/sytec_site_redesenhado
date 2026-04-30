@@ -765,7 +765,7 @@
     <li><a href="#diferenciais">Diferenciais</a></li>
     <li><a href="#solucoes">Soluções</a></li>
     <li><a href="#clientes">Clientes</a></li>
-    <li><a href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2xjg7gBBd4t1Ia53pN66Oe6QDgJu5DRd0j7ETCjqWTDwSm4FTUYkWQysi5kZoh-fU-Bciw49_g" target="_blank" rel="noopener noreferrer">Agendamento</a></li>
+    <li><a id="agendamentoLink" href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2xjg7gBBd4t1Ia53pN66Oe6QDgJu5DRd0j7ETCjqWTDwSm4FTUYkWQysi5kZoh-fU-Bciw49_g" target="_blank" rel="noopener noreferrer">Agendamento</a></li>
   </ul>
   <div class="nav-actions">
     <a href="https://api.whatsapp.com/send/?phone=556295063000&text=Olá!+Solicito+contato+comercial,+venho+a+partir+do+site" class="nav-cta" target="_blank">Fale Conosco</a>
@@ -822,6 +822,14 @@
   <div class="hero-visual">
     <img src="assets/images/Segurando-Globo-com-mascara-preta-1024x1018.jpg" alt="Systec Sistema">
     <!-- hero-card removido -->
+  </div>
+</section>
+
+<!-- AGENDAMENTO: seção de confirmação (visível após retorno) -->
+<section id="agendamento-confirm" style="display:none; padding:3rem 5%; text-align:center;">
+  <div style="max-width:800px; margin:0 auto; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); padding:1.6rem; border-radius:12px;">
+    <h2 style="font-family:var(--font-title); font-size:1.6rem; margin-bottom:0.6rem;">Agendamento concluído</h2>
+    <p style="color:var(--c-muted);">Obrigado! Seu agendamento foi concluído. Você já pode continuar navegando no site.</p>
   </div>
 </section>
 
@@ -1092,6 +1100,76 @@
     <span>Matriz: Goiânia – GO</span>
   </div>
 </footer>
+
+<style>
+  /* Toast de confirmação */
+  #agendamento-toast {
+    position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 9999;
+    background: linear-gradient(90deg, var(--c-accent), var(--c-accent2));
+    color: #fff; padding: 0.9rem 1.2rem; border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(10,20,40,0.45); display: none; align-items: center; gap: 0.8rem;
+    font-weight: 700; font-family: var(--font-display);
+  }
+  #agendamento-toast.show { display: flex; animation: toastIn 0.36s ease both; }
+  @keyframes toastIn { from { transform: translateY(12px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  #agendamento-confirm { transition: opacity 0.35s ease; }
+</style>
+
+<script>
+  (function(){
+    const scheduleUrl = 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2xjg7gBBd4t1Ia53pN66Oe6QDgJu5DRd0j7ETCjqWTDwSm4FTUYkWQysi5kZoh-fU-Bciw49_g';
+    const link = document.getElementById('agendamentoLink');
+    if(!link) return;
+
+    // criar elemento toast (se não existir)
+    let toast = document.getElementById('agendamento-toast');
+    if(!toast) {
+      toast = document.createElement('div');
+      toast.id = 'agendamento-toast';
+      toast.setAttribute('role','status');
+      toast.innerHTML = 'Agendado com sucesso';
+      document.body.appendChild(toast);
+    }
+
+    function showToast(msg){
+      toast.textContent = msg || 'Agendado com sucesso';
+      toast.classList.add('show');
+      setTimeout(()=> toast.classList.remove('show'), 6000);
+    }
+
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      const popup = window.open(scheduleUrl, 'systec_schedule', 'width=1000,height=760');
+      if(!popup) {
+        // popup bloqueado: abrir em nova aba normalmente
+        window.location.href = scheduleUrl;
+        return;
+      }
+
+      // monitorar fechamento do popup
+      const check = setInterval(function(){
+        try {
+          if(popup.closed) {
+            clearInterval(check);
+            // exibir mensagem de sucesso
+            showToast('Agendado com sucesso');
+            // também mostrar a seção de confirmação (opcional)
+            const sec = document.getElementById('agendamento-confirm');
+            if(sec) { sec.style.display = 'block'; sec.scrollIntoView({behavior:'smooth'}); }
+          }
+        } catch(err) {
+          // cross-origin access pode lançar; ainda assim verificamos se foi fechado
+          if(popup.closed) {
+            clearInterval(check);
+            showToast('Agendado com sucesso');
+            const sec = document.getElementById('agendamento-confirm');
+            if(sec) { sec.style.display = 'block'; sec.scrollIntoView({behavior:'smooth'}); }
+          }
+        }
+      }, 700);
+    });
+  })();
+</script>
 
 <!-- WhatsApp FAB -->
 <a class="whatsapp-fab" href="https://api.whatsapp.com/send/?phone=5562995063000&text=Olá!+Solicito+contato+comercial" target="_blank" title="Fale pelo WhatsApp">

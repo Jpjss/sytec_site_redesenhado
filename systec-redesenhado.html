@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Systec Sistemas – Especialista em Calçados e Confecções</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,6 +29,7 @@
     --font-display: 'Syne', sans-serif;
     --font-body: 'DM Sans', sans-serif;
     --font-title: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    --nav-offset: 100px;
   }
 
   body[data-theme="light"] {
@@ -59,6 +60,10 @@
     cursor: auto;
     transition: background-color 0.35s ease, color 0.35s ease;
   }
+
+  /* Safe-area for devices with notch/status bar (iOS) */
+  /* Only reserve the safe-area inset on body; page offset is handled by --nav-offset applied to the hero */
+  body { padding-top: env(safe-area-inset-top, 0); padding-top: constant(safe-area-inset-top, 0); padding-bottom: env(safe-area-inset-bottom, 0); padding-bottom: constant(safe-area-inset-bottom, 0); }
 
   /* Custom cursor */
   .cursor {
@@ -97,6 +102,7 @@
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     padding: 1.5rem 5%;
+    padding-top: calc(1.5rem + env(safe-area-inset-top, 0));
     display: flex; align-items: center; justify-content: space-between;
     transition: background 0.4s, padding 0.4s, backdrop-filter 0.4s;
   }
@@ -107,6 +113,23 @@
     border-bottom: 1px solid var(--c-border);
   }
   .nav-logo img { height: 36px; filter: var(--logo-filter); }
+  .hamburger {
+    display: none; background: transparent; border: 0; cursor: pointer;
+    width: 44px; height: 40px; align-items: center; justify-content: center;
+  }
+  .hamburger span {
+    display: block; width: 22px; height: 2px; background: var(--c-white); border-radius: 2px; position: relative;
+  }
+  .hamburger span::before, .hamburger span::after {
+    content: '';
+    position: absolute; left: 0; width: 22px; height: 2px; background: var(--c-white); border-radius: 2px;
+    transition: transform .22s ease, top .18s ease;
+  }
+  .hamburger span::before { top: -7px; }
+  .hamburger span::after { top: 7px; }
+  .hamburger[aria-expanded="true"] span { background: transparent; }
+  .hamburger[aria-expanded="true"] span::before { transform: translateY(7px) rotate(45deg); }
+  .hamburger[aria-expanded="true"] span::after { transform: translateY(-7px) rotate(-45deg); }
   .nav-links { display: flex; gap: 2.5rem; list-style: none; }
   .nav-links a {
     font-family: var(--font-display); font-size: 0.85rem;
@@ -152,11 +175,25 @@
   }
   .nav-cta:hover { background: var(--c-accent2); transform: translateY(-2px); }
 
+  /* Mobile menu overlay */
+  .mobile-menu {
+    position: fixed; left: 0; right: 0; top: calc(var(--nav-offset, 100px)); bottom: 0;
+    background: linear-gradient(180deg, rgba(6,9,16,0.98), rgba(6,9,16,0.96));
+    z-index: 95; padding: 2rem 5%; transform: translateY(-6%); opacity: 0; pointer-events: none;
+    transition: transform .28s ease, opacity .28s ease; display: flex; align-items: flex-start;
+  }
+  .mobile-menu.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .mobile-links { list-style: none; width: 100%; display: flex; flex-direction: column; gap: 0.6rem; }
+  .mobile-links a { color: var(--c-white); text-decoration: none; font-size: 1.05rem; padding: 0.85rem 1rem; border-radius: 8px; display: inline-block; }
+  .mobile-links a:hover { background: rgba(255,255,255,0.03); }
+  .mobile-links .nav-cta { display: inline-block; margin-top: 0.6rem; }
+
   /* ── HERO ── */
   #hero {
     min-height: 100vh;
     display: flex; align-items: center;
-    padding: 0 5%; padding-top: 100px;
+    padding: 1rem 5%; /* body padding-top handles nav offset */
+    margin-top: var(--nav-offset, 0px);
     position: relative; overflow: hidden;
   }
 
@@ -680,6 +717,20 @@
     .solucoes-cards { grid-template-columns: 1fr; }
     .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
     .nav-links { display: none; }
+    /* Mobile nav: logo/CTA on first row, hamburger below logo */
+    nav {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        "logo actions"
+        "hamburger hamburger";
+      align-items: center;
+      row-gap: 0.35rem;
+    }
+    .nav-logo { grid-area: logo; position: static; left: auto; transform: none; justify-self: start; z-index: 110; }
+    .nav-actions { grid-area: actions; position: static; right: auto; top: auto; justify-self: end; }
+    .hamburger { grid-area: hamburger; display: flex; position: static; left: auto; top: auto; justify-self: start; z-index: 120; }
+    .mobile-menu { top: calc(var(--nav-offset, 100px)); }
     .nav-actions { gap: 0.5rem; }
     .theme-toggle { padding: 0 0.7rem; font-size: 0.68rem; }
   }
@@ -761,6 +812,9 @@
   <a href="#" class="nav-logo">
     <img src="assets/images/logo-branca-png-1024x243.png" alt="Systec Sistemas">
   </a>
+  <button id="navToggle" class="hamburger" aria-controls="mobileMenu" aria-expanded="false" aria-label="Abrir menu">
+    <span></span>
+  </button>
   <ul class="nav-links">
     <li><a href="#diferenciais">Diferenciais</a></li>
     <li><a href="#solucoes">Soluções</a></li>
@@ -771,6 +825,17 @@
     <a href="https://api.whatsapp.com/send/?phone=556295063000&text=Olá!+Solicito+contato+comercial,+venho+a+partir+do+site" class="nav-cta" target="_blank">Fale Conosco</a>
   </div>
 </nav>
+
+<!-- Mobile menu (used on small screens) -->
+<div id="mobileMenu" class="mobile-menu" aria-hidden="true">
+  <ul class="mobile-links">
+    <li><a href="#diferenciais">Diferenciais</a></li>
+    <li><a href="#solucoes">Soluções</a></li>
+    <li><a href="#clientes">Clientes</a></li>
+    <li><a id="agendamentoLinkMobile" href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2xjg7gBBd4t1Ia53pN66Oe6QDgJu5DRd0j7ETCjqWTDwSm4FTUYkWQysi5kZoh-fU-Bciw49_g" target="_blank" rel="noopener noreferrer">Agendamento</a></li>
+    <li><a href="https://api.whatsapp.com/send/?phone=556295063000&text=Olá!+Solicito+contato+comercial,+venho+a+partir+do+site" class="nav-cta" target="_blank">Fale Conosco</a></li>
+  </ul>
+</div>
 
 <!-- HERO -->
 <section id="hero">
@@ -937,6 +1002,73 @@
     </div>
   </div>
 </section>
+
+<script>
+  (function(){
+    var nav = document.getElementById('mainNav');
+    var toggle = document.getElementById('navToggle');
+    var mobileMenu = document.getElementById('mobileMenu');
+
+    function updateNavOffset(){
+      var n = document.getElementById('mainNav');
+      if(!n) return;
+      // use getBoundingClientRect for accurate height
+      var rect = n.getBoundingClientRect();
+      var h = Math.round(rect.height) || 100;
+      var buffer = 18; // increased buffer to avoid overlap in Edge
+      h = h + buffer;
+      document.documentElement.style.setProperty('--nav-offset', h + 'px');
+      if(mobileMenu) mobileMenu.style.top = h + 'px';
+    }
+
+    function openMenu(){
+      if(toggle) toggle.setAttribute('aria-expanded','true');
+      if(mobileMenu) { mobileMenu.classList.add('open'); mobileMenu.setAttribute('aria-hidden','false'); }
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu(){
+      if(toggle) toggle.setAttribute('aria-expanded','false');
+      if(mobileMenu) { mobileMenu.classList.remove('open'); mobileMenu.setAttribute('aria-hidden','true'); }
+      document.body.style.overflow = '';
+    }
+
+    if(toggle){
+      toggle.addEventListener('click', function(){
+        var expanded = toggle.getAttribute('aria-expanded') === 'true';
+        if(expanded) closeMenu(); else openMenu();
+      });
+    }
+
+    if(mobileMenu){
+      mobileMenu.addEventListener('click', function(e){
+        if(e.target && e.target.tagName === 'A') closeMenu();
+      });
+    }
+
+    // ensure fonts/images are loaded before measuring to avoid wrong height
+    if(document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function(){ setTimeout(updateNavOffset, 60); });
+    }
+    window.addEventListener('load', function(){ setTimeout(updateNavOffset, 60); });
+    window.addEventListener('resize', function(){
+      setTimeout(updateNavOffset, 80);
+      if(window.innerWidth > 900) closeMenu();
+    });
+
+    // Recalculate if nav height changes during scroll (e.g., nav.scrolled toggles)
+    var scrollTimer;
+    window.addEventListener('scroll', function(){
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(updateNavOffset, 80);
+    });
+
+    // close on ESC
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeMenu(); });
+
+    updateNavOffset();
+  })();
+</script>
 
 <!-- SOLUÇÕES -->
 <section id="solucoes">
